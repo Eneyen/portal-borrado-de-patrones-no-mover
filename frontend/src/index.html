@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Limpieza de Patrones</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/i18next@21.6.16/i18next.min.js"></script>
+  <script src="https://unpkg.com/react-i18next@11.16.7/react-i18next.js"></script>
+  <style>
+    :root {
+      --color-background: #121212;
+      --color-surface: #1E1E1E;
+      --color-surface-variant: #333333;
+      --color-primary: #4A148C;
+      --color-primary-variant: #9C27B0;
+      --color-accent: #CE93D8;
+      --color-text-primary: #FFFFFF;
+      --color-text-secondary: #B0B0B0;
+      --color-error: #CF6679;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--color-background) 0%, var(--color-primary) 100%);
+    }
+    
+    .login-card {
+      background-color: var(--color-surface);
+      border-radius: 8px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      margin-top: 30px;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .login-header h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, var(--color-primary-variant), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .login-header p {
+      color: var(--color-text-secondary);
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      background-color: var(--color-surface-variant);
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: var(--color-text-primary);
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary-variant);
+      box-shadow: 0 0 0 2px rgba(156, 39, 176, 0.2);
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: var(--color-primary-variant);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .login-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+    
+    .login-footer a {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+    
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .cosmic-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+    
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 4s infinite;
+    }
+    
+    @keyframes twinkle {
+      0% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+      100% { opacity: 0.2; }
+    }
+    
+    /* Estilos para el selector de idioma */
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .language-button {
+      background: linear-gradient(45deg, #4A148C 30%, #9C27B0 90%);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .language-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .language-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 5px;
+      background-color: #1E1E1E;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      width: 150px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .language-option {
+      padding: 12px 16px;
+      color: #B0B0B0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+
+    .language-option:hover {
+      background-color: #333333;
+      color: white;
+    }
+
+    .language-option.active {
+      background-color: rgba(156, 39, 176, 0.2);
+      color: #CE93D8;
+      font-weight: 500;
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+      .language-selector {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .language-button {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+    
+    /* Estilos para alertas */
+    .alert {
+      background-color: rgba(207, 102, 121, 0.1);
+      border-left: 4px solid var(--color-error);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    
+    .alert p {
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .alert-button {
+      background-color: transparent;
+      color: var(--color-accent);
+      border: 1px solid var(--color-accent);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .alert-button:hover {
+      background-color: rgba(156, 39, 176, 0.1);
+    }
+
+    /* Estilos para el stepper */
+    .stepper {
+      display: flex;
+      margin-bottom: 30px;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+
+    .step-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: var(--color-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      color: var(--color-text-secondary);
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-circle {
+      background-color: var(--color-primary-variant);
+      color: white;
+    }
+
+    .step.completed .step-circle {
+      background-color: var(--color-accent);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-label {
+      color: var(--color-accent);
+      font-weight: 500;
+    }
+
+    .step-connector {
+      position: absolute;
+      top: 15px;
+      height: 2px;
+      width: 100%;
+      right: 50%;
+      background-color: var(--color-surface-variant);
+      z-index: -1;
+    }
+
+    .step:first-child .step-connector {
+      display: none;
+    }
+
+    .step.completed .step-connector {
+      background-color: var(--color-accent);
+    }
+
+    /* Estilos para el título principal fuera del formulario - ESPECTACULAR */
+    .main-title {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: glow 3s infinite alternate;
+      position: relative;
+      z-index: 10;
+    }
+
+    .main-title h1 {
+      font-size: 48px;
+      font-weight: 800;
+      background: linear-gradient(45deg, #9C27B0 10%, #CE93D8 50%, #9C27B0 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      text-shadow: 0 0 20px rgba(156, 39, 176, 0.5);
+      letter-spacing: 2px;
+      transform: perspective(500px) rotateX(10deg);
+      padding: 20px 0;
+      position: relative;
+    }
+
+    .main-title h1::before,
+    .main-title h1::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 150px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #CE93D8, transparent);
+      transform: translateX(-50%);
+    }
+
+    .main-title h1::after {
+      top: auto;
+      bottom: 0;
+    }
+
+    .main-title p {
+      color: var(--color-text-secondary);
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.6;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes glow {
+      0% {
+        filter: drop-shadow(0 0 5px rgba(156, 39, 176, 0.3));
+      }
+      100% {
+        filter: drop-shadow(0 0 20px rgba(156, 39, 176, 0.7));
+      }
+    }
+
+    /* Efectos adicionales para el título */
+    .cosmic-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: radial-gradient(circle, #CE93D8 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float 10s infinite;
+    }
+
+    @keyframes float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) translateX(20px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    // Traducciones
+    const resources = {
+      es: {
+        translation: {
+          // Navegación
+          "home": "Inicio",
+          "patterns": "Patrones",
+          "add_pattern": "Añadir",
+          "guide": "Guía",
+          "profile": "Perfil",
+          
+          // Autenticación
+          "login_title": "Portal de Limpieza de Patrones",
+          "login_subtitle": "Accede para gestionar tus patrones de ascensión espiritual",
+          "register_title": "Registro de Usuario",
+          "register_subtitle": "Crea tu cuenta para acceder al portal",
+          "email": "Correo Electrónico",
+          "password": "Contraseña",
+          "confirm_password": "Confirmar Contraseña",
+          "name": "Nombre",
+          "login_button": "Iniciar Sesión",
+          "register_button": "Registrarse",
+          "processing": "Procesando...",
+          "no_account": "¿No tienes una cuenta?",
+          "register_link": "Regístrate",
+          "have_account": "¿Ya tienes una cuenta?",
+          "login_link": "Inicia Sesión",
+          
+          // Preguntas de seguridad
+          "security_question_title": "Preguntas de Verificación",
+          "security_question_subtitle": "Por favor, responde correctamente para continuar",
+          "question1": "¿Cuál es el tanto por ciento necesario para acceder a la página oculta de limpieza de patrones?",
+          "question2": "¿De dónde es el Portal de los Maestros Ascendidos?",
+          "answer1_placeholder": "Introduce el porcentaje",
+          "answer2_placeholder": "Introduce el lugar",
+          "verify_button": "Verificar",
+          "verification_success": "Verificación exitosa. Puedes continuar con el registro.",
+          "verification_error": "Respuestas incorrectas. Por favor, intenta de nuevo.",
+          
+          // Mensajes
+          "required_fields": "Por favor, completa todos los campos",
+          "passwords_not_match": "Las contraseñas no coinciden",
+          "login_error": "Error al iniciar sesión. Por favor, intenta de nuevo.",
+          "register_error": "Error al registrarse. Por favor, intenta de nuevo.",
+          "accept": "Aceptar",
+          
+          // Idiomas
+          "language": "Idioma",
+          "spanish": "Español",
+          "english": "Inglés",
+          "french": "Francés"
+        }
+      },
+      en: {
+        translation: {
+          // Navigation
+          "home": "Home",
+          "patterns": "Patterns",
+          "add_pattern": "Add",
+          "guide": "Guide",
+          "profile": "Profile",
+          
+          // Authentication
+          "login_title": "Pattern Clearing Portal",
+          "login_subtitle": "Access to manage your spiritual ascension patterns",
+          "register_title": "User Registration",
+          "register_subtitle": "Create your account to access the portal",
+          "email": "Email",
+          "password": "Password",
+          "confirm_password": "Confirm Password",
+          "name": "Name",
+          "login_button": "Login",
+          "register_button": "Register",
+          "processing": "Processing...",
+          "no_account": "Don't have an account?",
+          "register_link": "Register",
+          "have_account": "Already have an account?",
+          "login_link": "Login",
+          
+          // Preguntas de seguridad
+          "security_question_title": "Verification Questions",
+          "security_question_subtitle": "Please answer correctly to continue",
+          "question1": "What percentage is needed to access the hidden pattern clearing page?",
+          "question2": "Where is the Portal of Ascended Masters located?",
+          "answer1_placeholder": "Enter the percentage",
+          "answer2_placeholder": "Enter the location",
+          "verify_button": "Verify",
+          "verification_success": "Verification successful. You can continue with registration.",
+          "verification_error": "Incorrect answers. Please try again.",
+          
+          // Messages
+          "required_fields": "Please complete all fields",
+          "passwords_not_match": "Passwords do not match",
+          "login_error": "Login error. Please try again.",
+          "register_error": "Registration error. Please try again.",
+          "accept": "Accept",
+          
+          // Languages
+          "language": "Language",
+          "spanish": "Spanish",
+          "english": "English",
+          "french": "French"
+        }
+      },
+      fr: {
+        translation: {
+          // Navigation
+          "home": "Accueil",
+          "patterns": "Modèles",
+          "add_pattern": "Ajouter",
+          "guide": "Guide",
+          "profile": "Profil",
+          
+          // Authentication
+          "login_title": "Portail d'effacement des schémas",
+          "login_subtitle": "Accédez pour gérer vos modèles d'ascension spirituelle",
+          "register_title": "Inscription Utilisateur",
+          "register_subtitle": "Créez votre compte pour accéder au portail",
+          "email": "Email",
+          "password": "Mot de passe",
+          "confirm_password": "Confirmer le mot de passe",
+          "name": "Nom",
+          "login_button": "Connexion",
+          "register_button": "S'inscrire",
+          "processing": "Traitement...",
+          "no_account": "Vous n'avez pas de compte?",
+          "register_link": "Inscrivez-vous",
+          "have_account": "Vous avez déjà un compte?",
+          "login_link": "Connectez-vous",
+          
+          // Preguntas de seguridad
+          "security_question_title": "Questions de Vérification",
+          "security_question_subtitle": "Veuillez répondre correctement pour continuer",
+          "question1": "Quel pourcentage est nécessaire pour accéder à la page cachée de nettoyage des modèles?",
+          "question2": "Où se trouve le Portail des Maîtres Ascensionnés?",
+          "answer1_placeholder": "Entrez le pourcentage",
+          "answer2_placeholder": "Entrez le lieu",
+          "verify_button": "Vérifier",
+          "verification_success": "Vérification réussie. Vous pouvez continuer avec l'inscription.",
+          "verification_error": "Réponses incorrectes. Veuillez réessayer.",
+          
+          // Messages
+          "required_fields": "Veuillez remplir tous les champs",
+          "passwords_not_match": "Les mots de passe ne correspondent pas",
+          "login_error": "Erreur de connexion. Veuillez réessayer.",
+          "register_error": "Erreur d'inscription. Veuillez réessayer.",
+          "accept": "Accepter",
+          
+          // Languages
+          "language": "Langue",
+          "spanish": "Espagnol",
+          "english": "Anglais",
+          "french": "Français"
+        }
+      }
+    };
+
+    // Inicializar i18next
+    const i18n = i18next.createInstance();
+    
+    i18n.init({
+      resources,
+      lng: localStorage.getItem('language') || 'en', // Idioma por defecto: inglés
+      fallbackLng: 'en',
+      interpolation: {
+        escapeValue: false
+      }
+    });
+
+    // Componente selector de idioma
+    const LanguageSelector = () => {
+      const [isOpen, setIsOpen] = React.useState(false);
+      const [currentLang, setCurrentLang] = React.useState(i18n.language);
+      
+      // Cambiar idioma
+      const changeLanguage = (lng) => {
+        i18n.changeLanguage(lng);
+        localStorage.setItem('language', lng);
+        setCurrentLang(lng);
+        setIsOpen(false);
+        
+        // Forzar actualización de la aplicación
+        window.location.reload();
+      };
+      
+      // Obtener texto del botón según el idioma actual
+      const getButtonText = () => {
+        if (currentLang === 'en') return 'CHOOSE LANGUAGE';
+        if (currentLang === 'es') return 'ELEGIR IDIOMA';
+        if (currentLang === 'fr') return 'CHOISIR LANGUE';
+        return 'CHOOSE LANGUAGE';
+      };
+      
+      // Cerrar el menú al hacer clic fuera
+      React.useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (isOpen && !e.target.closest('.language-selector')) {
+            setIsOpen(false);
+          }
+        };
+        
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+          document.removeEventListener('click', handleClickOutside);
+        };
+      }, [isOpen]);
+      
+      return (
+        <div className="language-selector">
+          <button 
+            className="language-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
+          >
+            {getButtonText()}
+          </button>
+          
+          {isOpen && (
+            <div className="language-dropdown">
+              <div 
+                className={`language-option ${currentLang === 'en' ? 'active' : ''}`}
+                onClick={() => changeLanguage('en')}
+              >
+                INGLÉS
+              </div>
+              <div 
+                className={`language-option ${currentLang === 'es' ? 'active' : ''}`}
+                onClick={() => changeLanguage('es')}
+              >
+                ESPAÑOL
+              </div>
+              <div 
+                className={`language-option ${currentLang === 'fr' ? 'active' : ''}`}
+                onClick={() => changeLanguage('fr')}
+              >
+                FRANCÉS
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Componente de fondo cósmico
+    const CosmicBackground = () => {
+      React.useEffect(() => {
+        const createStars = () => {
+          const cosmicBg = document.createElement('div');
+          cosmicBg.className = 'cosmic-bg';
+          document.body.appendChild(cosmicBg);
+          
+          for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = `${Math.random() * 3}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDuration = `${Math.random() * 4 + 3}s`;
+            cosmicBg.appendChild(star);
+          }
+        };
+        
+        createStars();
+        
+        return () => {
+          const cosmicBg = document.querySelector('.cosmic-bg');
+          if (cosmicBg) {
+            document.body.removeChild(cosmicBg);
+          }
+        };
+      }, []);
+      
+      return null;
+    };
+
+    // Componente de partículas cósmicas para el título
+    const CosmicParticles = () => {
+      React.useEffect(() => {
+        const container = document.createElement('div');
+        container.className = 'cosmic-particles';
+        document.querySelector('.main-title').appendChild(container);
+        
+        for (let i = 0; i < 20; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.width = `${Math.random() * 20 + 5}px`;
+          particle.style.height = particle.style.width;
+          particle.style.left = `${Math.random() * 100}%`;
+          particle.style.top = `${Math.random() * 100}%`;
+          particle.style.animationDuration = `${Math.random() * 10 + 5}s`;
+          particle.style.animationDelay = `${Math.random() * 5}s`;
+          container.appendChild(particle);
+        }
+        
+        return () => {
+          const particles = document.querySelector('.cosmic-particles');
+          if (particles) {
+            particles.remove();
+          }
+        };
+      }, []);
+      
+      return null;
+    };
+
+    // Componente de alerta
+    const Alert = ({ message, onClose }) => {
+      if (!message) return null;
+      
+      return (
+        <div className="alert">
+          <p>{message}</p>
+          <button className="alert-button" onClick={onClose}>
+            {i18n.t('accept')}
+          </button>
+        </div>
+      );
+    };
+
+    // Componente de Stepper
+    const Stepper = ({ steps, activeStep }) => {
+      return (
+        <div className="stepper">
+          {steps.map((step, index) => (
+            <div 
+              key={index} 
+              className={`step ${index === activeStep ? 'active' : ''} ${index < activeStep ? 'completed' : ''}`}
+            >
+              <div className="step-connector"></div>
+              <div className="step-circle">{index + 1}</div>
+              <div className="step-label">{step}</div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+    // Componente de preguntas de seguridad
+    const SecurityQuestions = ({ onVerificationSuccess }) => {
+      const [securityAnswer1, setSecurityAnswer1] = React.useState('');
+      const [securityAnswer2, setSecurityAnswer2] = React.useState('');
+      const [error, setError] = React.useState('');
+      const [isLoading, setIsLoading] = React.useState(false);
+      
+      // Función para verificar las respuestas de seguridad
+      const verifySecurityQuestions = () => {
+        if (!securityAnswer1 || !securityAnswer2) {
+          setError(i18n.t('required_fields'));
+          return;
+        }
+        
+        setIsLoading(true);
+        
+        // Normalizar las respuestas (eliminar espacios, convertir a minúsculas)
+        const normalizedAnswer1 = securityAnswer1.trim().toLowerCase().replace('%', '');
+        const normalizedAnswer2 = securityAnswer2.trim().toLowerCase();
+        
+        // Respuesta correcta para la pregunta 1: 30 o 30%
+        const correctAnswer1 = '30';
+        
+        // Respuestas correctas para la pregunta 2 en diferentes idiomas
+        const correctAnswers2 = [
+          'nueva zelanda',
+          'new zealand',
+          'nouvelle-zélande',
+          'nouvelle zélande'
+        ];
+        
+        // Verificar las respuestas
+        const isAnswer1Correct = normalizedAnswer1 === correctAnswer1;
+        const isAnswer2Correct = correctAnswers2.includes(normalizedAnswer2);
+        
+        setTimeout(() => {
+          setIsLoading(false);
+          
+          if (isAnswer1Correct && isAnswer2Correct) {
+            setError('');
+            onVerificationSuccess();
+          } else {
+            setError(i18n.t('verification_error'));
+          }
+        }, 1000);
+      };
+      
+      return (
+        <>
+          <div className="login-header">
+            <h1>{i18n.t('security_question_title')}</h1>
+            <p>{i18n.t('security_question_subtitle')}</p>
+          </div>
+          
+          {error && <Alert message={error} onClose={() => setError('')} />}
+          
+          <div className="form-group">
+            <label>{i18n.t('question1')}</label>
+            <input
+              type="text"
+              className="form-control"
+              value={securityAnswer1}
+              onChange={(e) => setSecurityAnswer1(e.target.value)}
+              placeholder={i18n.t('answer1_placeholder')}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>{i18n.t('question2')}</label>
+            <input
+              type="text"
+              className="form-control"
+              value={securityAnswer2}
+              onChange={(e) => setSecurityAnswer2(e.target.value)}
+              placeholder={i18n.t('answer2_placeholder')}
+            />
+          </div>
+          
+          <button 
+            className="btn" 
+            onClick={verifySecurityQuestions}
+            disabled={isLoading}
+          >
+            {isLoading ? i18n.t('processing') : i18n.t('verify_button')}
+          </button>
+        </>
+      );
+    };
+
+    // Componente de registro
+    const RegisterForm = () => {
+      const [formData, setFormData] = React.useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      });
+      const [error, setError] = React.useState('');
+      const [isLoading, setIsLoading] = React.useState(false);
+      
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+          ...formData,
+          [name]: value
+        });
+      };
+      
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Validación básica
+        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+          setError(i18n.t('required_fields'));
+          return;
+        }
+        
+        if (formData.password !== formData.confirmPassword) {
+          setError(i18n.t('passwords_not_match'));
+          return;
+        }
+        
+        setIsLoading(true);
+        
+        // Simulación de registro exitoso - redirigir directamente sin alerta
+        setTimeout(() => {
+          setIsLoading(false);
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      };
+      
+      return (
+        <>
+          <div className="login-header">
+            <h1>{i18n.t('register_title')}</h1>
+            <p>{i18n.t('register_subtitle')}</p>
+          </div>
+          
+          {error && <Alert message={error} onClose={() => setError('')} />}
+          
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>{i18n.t('name')}</label>
+              <input
+                type="text"
+                name="name"
+                className="form-control"
+                value={formData.name}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>{i18n.t('email')}</label>
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>{i18n.t('password')}</label>
+              <input
+                type="password"
+                name="password"
+                className="form-control"
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>{i18n.t('confirm_password')}</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                className="form-control"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="btn"
+              disabled={isLoading}
+            >
+              {isLoading ? i18n.t('processing') : i18n.t('register_button')}
+            </button>
+          </form>
+        </>
+      );
+    };
+
+    // Componente de login
+    const LoginForm = ({ onRegisterClick }) => {
+      const [formData, setFormData] = React.useState({
+        email: '',
+        password: ''
+      });
+      const [error, setError] = React.useState('');
+      const [isLoading, setIsLoading] = React.useState(false);
+      
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+          ...formData,
+          [name]: value
+        });
+      };
+      
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Validación básica
+        if (!formData.email || !formData.password) {
+          setError(i18n.t('required_fields'));
+          return;
+        }
+        
+        setIsLoading(true);
+        
+        // Simulación de login exitoso - redirigir directamente sin alerta
+        setTimeout(() => {
+          setIsLoading(false);
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      };
+      
+      return (
+        <>
+          <div className="login-header">
+            <h1>{i18n.t('login_title')}</h1>
+            <p>{i18n.t('login_subtitle')}</p>
+          </div>
+          
+          {error && <Alert message={error} onClose={() => setError('')} />}
+          
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label>{i18n.t('email')}</label>
+              <input
+                type="email"
+                name="email"
+                className="form-control"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>{i18n.t('password')}</label>
+              <input
+                type="password"
+                name="password"
+                className="form-control"
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="btn"
+              disabled={isLoading}
+            >
+              {isLoading ? i18n.t('processing') : i18n.t('login_button')}
+            </button>
+          </form>
+          
+          <div className="login-footer">
+            <p>
+              {i18n.t('no_account')} <a href="#" onClick={onRegisterClick}>{i18n.t('register_link')}</a>
+            </p>
+          </div>
+        </>
+      );
+    };
+
+    // Título principal fuera del formulario - ESPECTACULAR
+    const MainTitle = () => {
+      return (
+        <div className="main-title">
+          <h1>{i18n.t('login_title')}</h1>
+          <p>{i18n.t('login_subtitle')}</p>
+          <CosmicParticles />
+        </div>
+      );
+    };
+
+    // Componente principal de la aplicación
+    function App() {
+      const [view, setView] = React.useState('login'); // 'login', 'security', 'register'
+      const [activeStep, setActiveStep] = React.useState(0);
+      
+      // Cambiar a la vista de registro
+      const handleRegisterClick = (e) => {
+        e.preventDefault();
+        setView('security');
+        setActiveStep(0);
+      };
+      
+      // Cambiar a la vista de login
+      const handleLoginClick = (e) => {
+        e.preventDefault();
+        setView('login');
+      };
+      
+      // Manejar verificación exitosa
+      const handleVerificationSuccess = () => {
+        setView('register');
+        setActiveStep(1);
+      };
+      
+      // Renderizar el contenido según la vista actual
+      const renderContent = () => {
+        switch (view) {
+          case 'security':
+            return (
+              <>
+                <Stepper 
+                  steps={[i18n.t('security_question_title'), i18n.t('register_title')]} 
+                  activeStep={activeStep} 
+                />
+                <SecurityQuestions onVerificationSuccess={handleVerificationSuccess} />
+                <div className="login-footer">
+                  <p>
+                    {i18n.t('have_account')} <a href="#" onClick={handleLoginClick}>{i18n.t('login_link')}</a>
+                  </p>
+                </div>
+              </>
+            );
+          case 'register':
+            return (
+              <>
+                <Stepper 
+                  steps={[i18n.t('security_question_title'), i18n.t('register_title')]} 
+                  activeStep={activeStep} 
+                />
+                <RegisterForm />
+                <div className="login-footer">
+                  <p>
+                    {i18n.t('have_account')} <a href="#" onClick={handleLoginClick}>{i18n.t('login_link')}</a>
+                  </p>
+                </div>
+              </>
+            );
+          default:
+            return <LoginForm onRegisterClick={handleRegisterClick} />;
+        }
+      };
+      
+      return (
+        <div className="login-container">
+          <CosmicBackground />
+          <LanguageSelector />
+          <MainTitle />
+          <div className="login-card">
+            {renderContent()}
+          </div>
+        </div>
+      );
+    }
+
+    // Renderizar la aplicación
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

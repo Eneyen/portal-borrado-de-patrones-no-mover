@@ -1,0 +1,33 @@
+{
+  "name": "patrones-web",
+  "version": "1.0.0",
+  "description": "Sitio web para gestionar patrones espirituales",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "import": "node backend/importar-patrones.js",
+    "build": "cd frontend && npm run build",
+    "install-all": "npm install && cd frontend && npm install"
+  },
+  "keywords": [
+    "patrones",
+    "espiritual",
+    "ascensión"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.8.6"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1",
+    "nodemon": "^2.0.22"
+  }
+}

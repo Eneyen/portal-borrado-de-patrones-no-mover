@@ -1,0 +1,97 @@
+import React, { useState, useEffect } from 'react';
+import i18next from 'i18next';
+import { useTranslation, initReactI18next } from 'react-i18next';
+// Importar archivos de traducción
+import es from './locales/es';
+import en from './locales/en';
+import fr from './locales/fr';
+// Configurar i18next
+i18next
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en,
+      es,
+      fr
+    },
+    lng: localStorage.getItem('language') || 'es', // Idioma por defecto: español
+    fallbackLng: 'es',
+    interpolation: {
+      escapeValue: false
+    }
+  });
+// Componente selector de idioma
+const LanguageSelector = () => {
+  const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language);
+  
+  // Cambiar idioma
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng);
+    setCurrentLang(lng);
+    setIsOpen(false);
+  };
+  
+  // Obtener texto del botón según el idioma actual
+  const getButtonText = () => {
+    if (currentLang === 'en') return 'CHOOSE LANGUAGE';
+    if (currentLang === 'es') return 'ELEGIR IDIOMA';
+    if (currentLang === 'fr') return 'CHOISIR LANGUE';
+    return 'CHOOSE LANGUAGE';
+  };
+  
+  // Cerrar el menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (isOpen) setIsOpen(false);
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen]);
+  
+  return (
+    <div className="language-selector">
+      <button 
+        className="language-button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+      >
+        {getButtonText()}
+      </button>
+      
+      {isOpen && (
+        <div className="language-dropdown">
+          <div 
+            className={`language-option ${currentLang === 'en' ? 'active' : ''}`}
+            onClick={() => changeLanguage('en')}
+            onMouseEnter={() => changeLanguage('en')}
+          >
+            INGLÉS
+          </div>
+          <div 
+            className={`language-option ${currentLang === 'es' ? 'active' : ''}`}
+            onClick={() => changeLanguage('es')}
+            onMouseEnter={() => changeLanguage('es')}
+          >
+            ESPAÑOL
+          </div>
+          <div 
+            className={`language-option ${currentLang === 'fr' ? 'active' : ''}`}
+            onClick={() => changeLanguage('fr')}
+            onMouseEnter={() => changeLanguage('fr')}
+          >
+            FRANCÉS
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+export default LanguageSelector;

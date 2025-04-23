@@ -1,0 +1,75 @@
+.language-selector {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.language-button {
+  background: linear-gradient(45deg, #4A148C 30%, #9C27B0 90%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  letter-spacing: 1px;
+}
+
+.language-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.language-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: #1E1E1E;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  width: 150px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.language-option {
+  padding: 12px 16px;
+  color: #B0B0B0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.language-option:hover {
+  background-color: #333333;
+  color: white;
+}
+
+.language-option.active {
+  background-color: rgba(156, 39, 176, 0.2);
+  color: #CE93D8;
+  font-weight: 500;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .language-selector {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .language-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Patrones Espirituales</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <link rel="stylesheet" href="static/css/main.css">
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/i18next@21.6.16/i18next.min.js"></script>
+  <script src="https://unpkg.com/react-i18next@11.16.7/react-i18next.js"></script>
+  <style>
+    /* Estilos para el selector de idioma */
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .language-button {
+      background: linear-gradient(45deg, #4A148C 30%, #9C27B0 90%);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .language-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .language-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 5px;
+      background-color: #1E1E1E;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      width: 150px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .language-option {
+      padding: 12px 16px;
+      color: #B0B0B0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+
+    .language-option:hover {
+      background-color: #333333;
+      color: white;
+    }
+
+    .language-option.active {
+      background-color: rgba(156, 39, 176, 0.2);
+      color: #CE93D8;
+      font-weight: 500;
+    }
+
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+      .language-selector {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .language-button {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    // Traducciones
+    const resources = {
+      es: {
+        translation: {
+          // Navegación
+          "home": "Inicio",
+          "patterns": "Patrones",
+          "add_pattern": "Añadir",
+          "guide": "Guía",
+          "profile": "Perfil",
+          
+          // Autenticación
+          "login_title": "Portal de Patrones Espirituales",
+          "login_subtitle": "Accede para gestionar tus patrones de ascensión espiritual",
+          "register_title": "Registro de Usuario",
+          "register_subtitle": "Crea tu cuenta para acceder al portal",
+          "email": "Correo Electrónico",
+          "password": "Contraseña",
+          "confirm_password": "Confirmar Contraseña",
+          "name": "Nombre",
+          "login_button": "Iniciar Sesión",
+          "register_button": "Registrarse",
+          "processing": "Procesando...",
+          "no_account": "¿No tienes una cuenta?",
+          "register_link": "Regístrate",
+          "have_account": "¿Ya tienes una cuenta?",
+          "login_link": "Inicia Sesión",
+          "login_success": "Inicio de sesión exitoso. Redirigiendo al dashboard...",
+          "register_success": "Registro exitoso. Redirigiendo al dashboard...",
+          
+          // Mensajes
+          "required_fields": "Por favor, completa todos los campos",
+          "passwords_not_match": "Las contraseñas no coinciden",
+          "login_error": "Error al iniciar sesión. Por favor, intenta de nuevo.",
+          "register_error": "Error al registrarse. Por favor, intenta de nuevo.",
+          "accept": "Aceptar",
+          
+          // Idiomas
+          "language": "Idioma",
+          "spanish": "Español",
+          "english": "Inglés",
+          "french": "Francés"
+        }
+      },
+      en: {
+        translation: {
+          // Navigation
+          "home": "Home",
+          "patterns": "Patterns",
+          "add_pattern": "Add",
+          "guide": "Guide",
+          "profile": "Profile",
+          
+          // Authentication
+          "login_title": "Spiritual Patterns Portal",
+          "login_subtitle": "Access to manage your spiritual ascension patterns",
+          "register_title": "User Registration",
+          "register_subtitle": "Create your account to access the portal",
+          "email": "Email",
+          "password": "Password",
+          "confirm_password": "Confirm Password",
+          "name": "Name",
+          "login_button": "Login",
+          "register_button": "Register",
+          "processing": "Processing...",
+          "no_account": "Don't have an account?",
+          "register_link": "Register",
+          "have_account": "Already have an account?",
+          "login_link": "Login",
+          "login_success": "Login successful. Redirecting to dashboard...",
+          "register_success": "Registration successful. Redirecting to dashboard...",
+          
+          // Messages
+          "required_fields": "Please complete all fields",
+          "passwords_not_match": "Passwords do not match",
+          "login_error": "Login error. Please try again.",
+          "register_error": "Registration error. Please try again.",
+          "accept": "Accept",
+          
+          // Languages
+          "language": "Language",
+          "spanish": "Spanish",
+          "english": "English",
+          "french": "French"
+        }
+      },
+      fr: {
+        translation: {
+          // Navigation
+          "home": "Accueil",
+          "patterns": "Modèles",
+          "add_pattern": "Ajouter",
+          "guide": "Guide",
+          "profile": "Profil",
+          
+          // Authentication
+          "login_title": "Portail des Modèles Spirituels",
+          "login_subtitle": "Accédez pour gérer vos modèles d'ascension spirituelle",
+          "register_title": "Inscription Utilisateur",
+          "register_subtitle": "Créez votre compte pour accéder au portail",
+          "email": "Email",
+          "password": "Mot de passe",
+          "confirm_password": "Confirmer le mot de passe",
+          "name": "Nom",
+          "login_button": "Connexion",
+          "register_button": "S'inscrire",
+          "processing": "Traitement...",
+          "no_account": "Vous n'avez pas de compte?",
+          "register_link": "Inscrivez-vous",
+          "have_account": "Vous avez déjà un compte?",
+          "login_link": "Connectez-vous",
+          "login_success": "Connexion réussie. Redirection vers le tableau de bord...",
+          "register_success": "Inscription réussie. Redirection vers le tableau de bord...",
+          
+          // Messages
+          "required_fields": "Veuillez remplir tous les champs",
+          "passwords_not_match": "Les mots de passe ne correspondent pas",
+          "login_error": "Erreur de connexion. Veuillez réessayer.",
+          "register_error": "Erreur d'inscription. Veuillez réessayer.",
+          "accept": "Accepter",
+          
+          // Languages
+          "language": "Langue",
+          "spanish": "Espagnol",
+          "english": "Anglais",
+          "french": "Français"
+        }
+      }
+    };
+
+    // Inicializar i18next
+    i18next.init({
+      resources,
+      lng: localStorage.getItem('language') || 'es', // Idioma por defecto: español
+      fallbackLng: 'es',
+      interpolation: {
+        escapeValue: false
+      }
+    });
+
+    // Componente selector de idioma
+    const LanguageSelector = () => {
+      const [isOpen, setIsOpen] = React.useState(false);
+      const [currentLang, setCurrentLang] = React.useState(i18next.language);
+      
+      // Cambiar idioma
+      const changeLanguage = (lng) => {
+        i18next.changeLanguage(lng);
+        localStorage.setItem('language', lng);
+        setCurrentLang(lng);
+        setIsOpen(false);
+      };
+      
+      // Obtener texto del botón según el idioma actual
+      const getButtonText = () => {
+        if (currentLang === 'en') return 'CHOOSE LANGUAGE';
+        if (currentLang === 'es') return 'ELEGIR IDIOMA';
+        if (currentLang === 'fr') return 'CHOISIR LANGUE';
+        return 'CHOOSE LANGUAGE';
+      };
+      
+      // Cerrar el menú al hacer clic fuera
+      React.useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (isOpen && !e.target.closest('.language-selector')) {
+            setIsOpen(false);
+          }
+        };
+        
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+          document.removeEventListener('click', handleClickOutside);
+        };
+      }, [isOpen]);
+      
+      return (
+        <div className="language-selector">
+          <button 
+            className="language-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
+          >
+            {getButtonText()}
+          </button>
+          
+          {isOpen && (
+            <div className="language-dropdown">
+              <div 
+                className={`language-option ${currentLang === 'en' ? 'active' : ''}`}
+                onClick={() => changeLanguage('en')}
+                onMouseEnter={() => changeLanguage('en')}
+              >
+                INGLÉS
+              </div>
+              <div 
+                className={`language-option ${currentLang === 'es' ? 'active' : ''}`}
+                onClick={() => changeLanguage('es')}
+                onMouseEnter={() => changeLanguage('es')}
+              >
+                ESPAÑOL
+              </div>
+              <div 
+                className={`language-option ${currentLang === 'fr' ? 'active' : ''}`}
+                onClick={() => changeLanguage('fr')}
+                onMouseEnter={() => changeLanguage('fr')}
+              >
+                FRANCÉS
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Componente principal de la aplicación
+    function App() {
+      // Estado para controlar si se muestra el formulario de login o registro
+      const [isLoginForm, setIsLoginForm] = React.useState(true);
+      // Estado para los mensajes de alerta
+      const [alertMessage, setAlertMessage] = React.useState('');
+      // Estado para indicar si está cargando
+      const [isLoading, setIsLoading] = React.useState(false);
+      // Estado para los datos del formulario
+      const [formData, setFormData] = React.useState({
+        email: '',
+        password: '',
+        confirmPassword: '',
+        name: ''
+      });
+
+      // Función para traducir
+      const t = (key) => i18next.t(key);
+
+      // Manejar cambios en los campos del formulario
+      const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+          ...formData,
+          [name]: value
+        });
+      };
+
+      // Manejar envío del formulario de login
+      const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Validación básica
+        if (!formData.email || !formData.password) {
+          setAlertMessage(t('required_fields'));
+          return;
+        }
+        
+        setIsLoading(true);
+        
+        try {
+          // Simulación de login exitoso
+          setAlertMessage(t('login_success'));
+          
+          // Redireccionar al dashboard
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+          
+        } catch (error) {
+          console.error('Error de login:', error);
+          setAlertMessage(t('login_error'));
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      // Manejar envío del formulario de registro
+      const handleRegisterSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Validación básica
+        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.name) {
+          setAlertMessage(t('required_fields'));
+          return;
+        }
+        
+        if (formData.password !== formData.confirmPassword) {
+          setAlertMessage(t('passwords_not_match'));
+          return;
+        }
+        
+        setIsLoading(true);
+        
+        try {
+          // Simulación de registro exitoso
+          setAlertMessage(t('register_success'));
+          
+          // Redireccionar al dashboard
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+          
+        } catch (error) {
+          console.error('Error de registro:', error);
+          setAlertMessage(t('register_error'));
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      // Alternar entre formularios de login y registro
+      const toggleForm = () => {
+        setIsLoginForm(!isLoginForm);
+        setAlertMessage('');
+      };
+
+      // Crear estrellas para el fondo cósmico
+      const stars = Array.from({ length: 100 }).map((_, i) => (
+        <div 
+          key={i} 
+          className="star" 
+          style={{
+            width: `${Math.random() * 3}px`,
+            height: `${Math.random() * 3}px`,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 4}s`
+          }}
+        />
+      ));
+
+      // Actualizar la interfaz cuando cambia el idioma
+      React.useEffect(() => {
+        const handleLanguageChange = () => {
+          // Forzar actualización del componente
+          setIsLoginForm(isLoginForm);
+        };
+        
+        i18next.on('languageChanged', handleLanguageChange);
+        
+        return () => {
+          i18next.off('languageChanged', handleLanguageChange);
+        };
+      }, [isLoginForm]);
+
+      return (
+        <div className="app">
+          {/* Fondo cósmico */}
+          <div className="cosmic-bg" id="stars">
+            {stars}
+          </div>
+          
+          {/* Selector de idioma */}
+          <LanguageSelector />
+          
+          {/* Contenedor principal */}
+          <div className="login-container">
+            <div className="login-card">
+              <div className="login-header">
+                <h1>{isLoginForm ? t('login_title') : t('register_title')}</h1>
+                <p>
+                  {isLoginForm ? t('login_subtitle') : t('register_subtitle')}
+                </p>
+              </div>
+              
+              {/* Mensaje de alerta */}
+              {alertMessage && (
+                <div className="alert">
+                  <p>{alertMessage}</p>
+                  <button className="alert-button" onClick={() => setAlertMessage('')}>
+                    {t('accept')}
+                  </button>
+                </div>
+              )}
+              
+              {/* Formulario de login */}
+              {isLoginForm ? (
+                <form onSubmit={handleLoginSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="email">{t('email')}</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      name="email"
+                      className="form-control" 
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      required 
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="password">{t('password')}</label>
+                    <input 
+                      type="password" 
+                      id="password" 
+                      name="password"
+                      className="form-control" 
+                      value={f
+(Content truncated due to size limit. Use line ranges to read in chunks)
